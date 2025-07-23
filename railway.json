@@ -1,0 +1,11 @@
+{
+  "build": {
+    "builder": "python",
+    "buildCommand": "",
+    "startCommand": "python main.py"
+  },
+  "deploy": {
+    "startCommand": "python main.py"
+  },
+  "rootDirectory": "backend"
+}
