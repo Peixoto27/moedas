@@ -1,1 +1,1 @@
-fetch("https://moedas.up.railway.app/signals")
+fetch("https://moedas-production.up.railway.app/signals")
