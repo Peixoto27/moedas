@@ -6,16 +6,16 @@ import os
 app = Flask(__name__)
 CORS(app)
 
-@app.route("/signals")
+@app.route("/signals", methods=["GET"])
 def get_signals():
-    sample = {
+    signal = {
         "pair": "BTC/USDT",
         "signal": "BUY",
         "entry": round(random.uniform(57000, 59000), 2),
         "target": round(random.uniform(59000, 61000), 2),
         "stop": round(random.uniform(56000, 57000), 2)
     }
-    return jsonify(sample)
+    return jsonify(signal)
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 8080))
