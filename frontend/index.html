@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Crypton Signals</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <div class="login-screen" id="login-screen">
+      <h2>🔐 Acesso Restrito</h2>
+      <input type="password" id="password-input" placeholder="Digite a senha..." />
+      <button onclick="checkPassword()">Entrar</button>
+    </div>
+
+    <div id="app" style="display: none;">
+      <header>
+        <img src="logo.png" alt="Logo Crypton" height="40" />
+        <h1>🔮 Crypton Signals</h1>
+      </header>
+      <div id="signals-container" class="grid-container"></div>
+    </div>
+
+    <script src="app.js"></script>
+  </body>
+</html>
