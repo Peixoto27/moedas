@@ -1,8 +1,10 @@
 from flask import Flask, jsonify
+from flask_cors import CORS  # ← Linha 2
 import random
 import os
 
 app = Flask(__name__)
+CORS(app)  # ← Logo depois de criar o app
 
 @app.route("/signals")
 def get_signals():
