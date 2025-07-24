@@ -1,33 +1,21 @@
-// Variável global para guardar o timeframe ativo
 let activeTimeframe = '1d';
 
-// Função chamada quando a página carrega
 document.addEventListener('DOMContentLoaded', () => {
-    // Busca os sinais do timeframe padrão ('1d') ao carregar a página
     fetchAndDisplaySignals(activeTimeframe);
 });
 
-// Função para mudar o timeframe e buscar novos dados
 function changeTimeframe(newTimeframe, clickedButton) {
-    // Atualiza o timeframe ativo
     activeTimeframe = newTimeframe;
-
-    // Atualiza o estilo dos botões para mostrar qual está ativo
     document.querySelectorAll('.timeframe-selector button').forEach(button => {
         button.classList.remove('active');
     });
     clickedButton.classList.add('active');
-
-    // Busca os sinais para o novo timeframe
     fetchAndDisplaySignals(activeTimeframe);
 }
 
-// Função principal para buscar e exibir os sinais
 async function fetchAndDisplaySignals(timeframe) {
-    // A URL agora aponta para a nova rota e inclui o parâmetro de timeframe
     const apiUrl = `https://moedas-production.up.railway.app/signals_v2?timeframe=${timeframe}`;
     const container = document.getElementById('signals-container' );
-
     container.innerHTML = `<p class="loading-message">Analisando o timeframe de ${timeframe}... ⏳</p>`;
 
     try {
@@ -47,7 +35,6 @@ async function fetchAndDisplaySignals(timeframe) {
         signals.forEach(signal => {
             const card = document.createElement('div');
             card.className = 'grid-item';
-
             let signalColor = '#6c757d';
             const signalText = signal.signal;
             if (signalText.includes('BUY') || signalText.includes('Alta')) {
@@ -55,7 +42,6 @@ async function fetchAndDisplaySignals(timeframe) {
             } else if (signalText.includes('SELL') || signalText.includes('Baixa')) {
                 signalColor = '#dc3545';
             }
-
             card.innerHTML = `
                 <h3>${signal.pair}</h3>
                 <p class="signal-text" style="color: ${signalColor}; font-weight: bold;">${signalText}</p>
@@ -67,9 +53,14 @@ async function fetchAndDisplaySignals(timeframe) {
             `;
             container.appendChild(card);
         });
-
     } catch (error) {
         console.error("Falha ao buscar sinais:", error);
         container.innerHTML = `<p class="error-message">Ops! Falha ao carregar sinais. ${error.message}</p>`;
     }
-}
+}```
+
+---
+
+Depois de colocar cada código no seu devido lugar dentro do branch `feature/timeframes`, o próximo passo será configurar a Railway e a Netlify para fazerem o deploy a partir das pastas e do branch corretos.
+
+Estou aqui para ajudar nessa configuração assim que você terminar de organizar os ficheiros.
