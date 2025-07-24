@@ -1,22 +1,43 @@
 from flask import Flask, jsonify
 from flask_cors import CORS
-import random
-import os
+import requests
 
 app = Flask(__name__)
 CORS(app)
 
-@app.route("/signals", methods=["GET"])
-def get_signals():
-    signal = {
-        "pair": "BTC/USDT",
-        "signal": "BUY",
-        "entry": round(random.uniform(57000, 59000), 2),
-        "target": round(random.uniform(59000, 61000), 2),
-        "stop": round(random.uniform(56000, 57000), 2)
+def get_crypto_price(symbol):
+    url = f'https://api.binance.com/api/v3/ticker/price?symbol={symbol}'
+    response = requests.get(url)
+    data = response.json()
+    return float(data['price'])
+
+def generate_signal(symbol):
+    price = get_crypto_price(symbol)
+    
+    # Exemplo simples de lógica
+    signal_type = "BUY" if symbol == "BTCUSDT" else "SELL"
+    stop = round(price * 0.98, 2)
+    target = round(price * 1.03, 2)
+
+    return {
+        "pair": symbol.replace("USDT", "/USDT"),
+        "entry": round(price, 2),
+        "signal": signal_type,
+        "stop": stop,
+        "target": target
     }
-    return jsonify(signal)
+
+@app.route("/signals")
+def get_signals():
+    try:
+        signals = [
+            generate_signal("BTCUSDT"),
+            generate_signal("ETHUSDT"),
+            generate_signal("XRPUSDT")
+        ]
+        return jsonify(signals)
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 8080))
-    app.run(host="0.0.0.0", port=port)
+    app.run(debug=True)
