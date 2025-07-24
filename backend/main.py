@@ -1,4 +1,3 @@
-# (Cole aqui o código completo do main.py que eu forneci na mensagem anterior)
 import os
 from flask import Flask, jsonify, request
 from flask_cors import CORS
