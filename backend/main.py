@@ -9,48 +9,33 @@ app = Flask(__name__)
 # Habilita o CORS
 CORS(app)
 
-# --- FUNÇÃO ALTERADA COM PROXY ---
+# --- FUNÇÃO ALTERADA PARA USAR A API DA BINANCE.US ---
 def get_crypto_price(symbol):
-    """Busca o preço atual de um par de moedas na Binance usando um proxy para evitar bloqueio geográfico."""
+    """Busca o preço atual de um par de moedas na API da Binance.US."""
     
-    # URL original da API da Binance
-    target_url = f'https://api.binance.com/api/v3/ticker/price?symbol={symbol}'
-    
-    # Usaremos um proxy para fazer a chamada.
-    # Este é um proxy público que pode ser lento ou falhar, mas serve para contornar o bloqueio.
-    # O proxy pega na nossa URL alvo e acede-a por nós.
-    proxy_url = f'https://api.allorigins.win/get?url={target_url}'
+    # ALTERAÇÃO CRUCIAL: Apontando para a API da Binance para os EUA (binance.us)
+    # Esta é a API correta para usar a partir de servidores localizados nos EUA.
+    url = f'https://api.binance.us/api/v3/ticker/price?symbol={symbol}'
     
     try:
-        # O pedido agora é feito ao servidor proxy
-        response = requests.get(proxy_url )
+        response = requests.get(url )
+        # Lança um erro se a resposta da API for inválida (ex: 404, 500)
         response.raise_for_status()
-        
-        # O proxy envolve a resposta original da Binance dentro de outro JSON.
-        # Precisamos de extrair o conteúdo original.
-        proxy_data = response.json()
-        
-        # O conteúdo real da Binance está na chave 'contents'
-        import json
-        binance_data = json.loads(proxy_data['contents'])
-        
-        # Verificamos se a Binance devolveu um erro dentro do JSON
-        if 'code' in binance_data and 'msg' in binance_data:
-            raise Exception(f"Erro da API Binance: {binance_data['msg']}")
-            
-        return float(binance_data['price'])
+        data = response.json()
+        return float(data['price'])
         
     except requests.exceptions.RequestException as e:
-        print(f"Erro ao contactar o proxy ou a API para {symbol}: {e}")
-        raise
-    except Exception as e:
-        print(f"Erro ao processar a resposta do proxy para {symbol}: {e}")
+        # Captura erros de rede ou da API e os imprime no log do servidor
+        print(f"Erro ao buscar preço para {symbol} em {url}: {e}")
         raise
 
 # Função para gerar um sinal (sem alterações)
 def generate_signal(symbol):
+    """Gera um sinal de negociação para um determinado par de moedas."""
     price = get_crypto_price(symbol)
+    
     signal_type = "BUY" if symbol in ["BTCUSDT", "ETHUSDT", "XRPUSDT"] else "SELL"
+    
     stop = round(price * 0.98, 2)
     target = round(price * 1.03, 2)
 
@@ -65,10 +50,12 @@ def generate_signal(symbol):
 # Rota principal (sem alterações)
 @app.route("/signals")
 def get_signals():
+    """Endpoint que retorna uma lista de sinais de criptomoedas."""
     try:
         symbols_to_process = ["BTCUSDT", "ETHUSDT", "XRPUSDT"]
         signals = [generate_signal(symbol) for symbol in symbols_to_process]
-        print("Sinais gerados com sucesso via proxy:")
+        
+        print("Sinais gerados com sucesso via API Binance.US:")
         print(signals)
         return jsonify(signals)
     except Exception as e:
