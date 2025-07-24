@@ -61,6 +61,6 @@ async function fetchAndDisplaySignals(timeframe) {
 
 ---
 
-Depois de colocar cada código no seu devido lugar dentro do branch `feature/timeframes`, o próximo passo será configurar a Railway e a Netlify para fazerem o deploy a partir das pastas e do branch corretos.
+container.innerHTML = `<p class="error-message">Ops! Falha ao carregar sinais. ${error.message}</p>`;
 
 Estou aqui para ajudar nessa configuração assim que você terminar de organizar os ficheiros.
