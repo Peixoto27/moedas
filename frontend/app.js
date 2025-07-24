@@ -1,35 +1,32 @@
-document.addEventListener("DOMContentLoaded", () => {
-  fetch("https://moedas-production.up.railway.app/signals")
-    .then(response => {
-      if (!response.ok) {
-        throw new Error("Erro na resposta da API");
-      }
-      return response.json();
-    })
-    .then(data => {
-      const signalElement = document.getElementById("signals");
+async function fetchSignals() {
+  try {
+    const response = await fetch("https://moedas-production.up.railway.app/signals");
+    const data = await response.json();
 
-      if (!signalElement) {
-        console.error("Elemento #signals não encontrado.");
-        return;
-      }
+    const container = document.getElementById("signals-container");
+    container.innerHTML = "";
 
-      signalElement.innerHTML = `
-        <div style="padding: 20px; background-color: #121212; border-radius: 12px; color: white;">
-          <h2>📊 Sinal de Cripto</h2>
-          <p><strong>Par:</strong> ${data.pair}</p>
-          <p><strong>Entrada:</strong> ${data.entry}</p>
-          <p><strong>Alvo:</strong> ${data.target}</p>
-          <p><strong>Stop:</strong> ${data.stop}</p>
-          <p><strong>Sinal:</strong> <span style="color: ${data.signal === 'BUY' ? 'green' : 'red'}">${data.signal}</span></p>
-        </div>
+    data.forEach(signal => {
+      const card = document.createElement("div");
+      card.className = "card";
+
+      const signalColor = signal.signal === "BUY" ? "green" : "red";
+
+      card.innerHTML = `
+        <h2>📊 Sinal de Cripto</h2>
+        <p><strong>Par:</strong> ${signal.pair}</p>
+        <p><strong>Entrada:</strong> ${signal.entry.toFixed(2)}</p>
+        <p><strong>Alvo:</strong> ${signal.target.toFixed(2)}</p>
+        <p><strong>Stop:</strong> ${signal.stop.toFixed(2)}</p>
+        <p><strong>Sinal:</strong> <span style="color:${signalColor}">${signal.signal}</span></p>
       `;
-    })
-    .catch(error => {
-      console.error("Erro ao buscar os sinais:", error);
-      const signalElement = document.getElementById("signals");
-      if (signalElement) {
-        signalElement.innerHTML = `<p style="color:red;">Erro ao carregar os sinais. Tente novamente mais tarde.</p>`;
-      }
+      container.appendChild(card);
     });
-});
+
+  } catch (error) {
+    console.error("Erro ao buscar sinais:", error);
+    document.getElementById("signals-container").innerHTML = "<p>Erro ao carregar os sinais.</p>";
+  }
+}
+
+document.addEventListener("DOMContentLoaded", fetchSignals);
