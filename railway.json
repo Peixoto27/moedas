@@ -1,6 +1,16 @@
-{
-  "rootDirectory": "backend",
-  "deploy": {
-    "startCommand": "python main.py"
+[
+  {
+    "pair": "BTC/USDT",
+    "entry": 57435.02,
+    "target": 59079.55,
+    "stop": 56251.2,
+    "signal": "BUY"
+  },
+  {
+    "pair": "ETH/USDT",
+    "entry": 3175.90,
+    "target": 3350.00,
+    "stop": 3100.00,
+    "signal": "SELL"
   }
-}
+]
