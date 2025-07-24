@@ -1,101 +1,76 @@
-// Espera o HTML da página carregar completamente antes de executar o script
-document.addEventListener('DOMContentLoaded', () => {
-    // Encontra os elementos na página
-    const loginButton = document.getElementById('login-button');
-    const passwordInput = document.getElementById('password');
-
-    // Verifica se o botão de login existe antes de adicionar o evento
-    if (loginButton) {
-        loginButton.addEventListener('click', login);
-    } else {
-        console.error("Erro: Botão de login com id 'login-button' não foi encontrado.");
-    }
-
-    // Verifica se o campo de senha existe antes de adicionar o evento
-    if (passwordInput) {
-        passwordInput.addEventListener('keyup', function(event) {
-            // Se a tecla pressionada for "Enter", tenta fazer o login
-            if (event.key === 'Enter') {
-                login();
-            }
-        });
-    } else {
-        console.error("Erro: Campo de senha com id 'password' não foi encontrado.");
-    }
-});
-
-// Função que realiza o login
-function login() {
+// O nome da função deve ser exatamente "checkPassword", como está no seu HTML.
+function checkPassword() {
     const correctPassword = "Zoe1001";
-    const passwordInput = document.getElementById('password');
-    const enteredPassword = passwordInput ? passwordInput.value : '';
+    const enteredPassword = document.getElementById('password-input').value; // O ID correto do seu input
 
-    const loginSection = document.getElementById('login-section');
-    const signalsSection = document.getElementById('signals-section');
-    const errorMessage = document.getElementById('error-message');
+    const loginScreen = document.getElementById('login-screen'); // A tela de login
+    const appContent = document.getElementById('app');           // O conteúdo principal do app
 
     if (enteredPassword === correctPassword) {
-        // Esconde a seção de login e mostra a de sinais
-        if (loginSection) loginSection.style.display = 'none';
-        if (signalsSection) signalsSection.style.display = 'block';
+        // Se a senha estiver correta, esconde a tela de login e mostra o app
+        loginScreen.style.display = 'none';
+        appContent.style.display = 'block';
         
-        // Chama a função para buscar os sinais da API
-        fetchSignals();
+        // Chama a função para buscar e exibir os sinais
+        fetchAndDisplaySignals();
     } else {
-        // Mostra a mensagem de erro de senha
-        if (errorMessage) errorMessage.style.display = 'block';
+        // Se a senha estiver errada, podemos dar um feedback visual
+        alert("Senha incorreta!"); // Um alerta simples é eficaz
+        document.getElementById('password-input').value = ''; // Limpa o campo
     }
 }
 
-// Função que busca os dados da API e preenche a tabela
-async function fetchSignals() {
+// Função para buscar os dados da API e criar os cards de sinais
+async function fetchAndDisplaySignals() {
     const apiUrl = "https://moedas-production.up.railway.app/signals";
-    const tableBody = document.querySelector("#signals-table tbody" );
-    const loadingIndicator = document.getElementById('loading');
-    const signalsTable = document.getElementById('signals-table');
+    const container = document.getElementById('signals-container' ); // O container onde os sinais serão inseridos
 
-    // Mostra "Carregando..."
-    if (loadingIndicator) loadingIndicator.style.display = 'block';
-    if (signalsTable) signalsTable.style.display = 'none';
+    // Mostra uma mensagem de "Carregando..." dentro do container
+    container.innerHTML = '<p class="loading-message">Buscando os melhores sinais na galáxia... 🚀</p>';
 
     try {
         const response = await fetch(apiUrl);
-        if (!response.ok) throw new Error(`Erro na API: ${response.statusText}`);
-        
+        if (!response.ok) {
+            throw new Error(`A API não respondeu como esperado: ${response.statusText}`);
+        }
         const signals = await response.json();
 
-        if (tableBody) tableBody.innerHTML = ''; // Limpa a tabela
+        // Limpa a mensagem de "Carregando..."
+        container.innerHTML = '';
 
+        // Cria um card para cada sinal recebido
         signals.forEach(signal => {
-            const row = document.createElement('tr');
-            
-            // Lógica de cores
-            let signalColor = '#6c757d'; // Cinza padrão
+            // Cria o elemento do card
+            const card = document.createElement('div');
+            card.className = 'grid-item'; // Usa a classe do seu CSS
+
+            // Define a cor baseada no sinal
+            let signalColor = '#6c757d'; // Cinza (padrão para HOLD/NEUTRAL)
             const signalText = signal.signal;
-            if (signalText.includes('BUY') || signalText.includes('Alta')) signalColor = '#28a745'; // Verde
-            else if (signalText.includes('SELL') || signalText.includes('Baixa')) signalColor = '#dc3545'; // Vermelho
+            if (signalText.includes('BUY') || signalText.includes('Alta')) {
+                signalColor = '#28a745'; // Verde
+            } else if (signalText.includes('SELL') || signalText.includes('Baixa')) {
+                signalColor = '#dc3545'; // Vermelho
+            }
 
-            // Preenche a linha da tabela
-            row.innerHTML = `
-                <td>${signal.pair}</td>
-                <td>${signal.entry.toFixed(4)}</td>
-                <td style="font-weight: bold; color: ${signalColor};">${signalText}</td>
-                <td>${signal.stop.toFixed(4)}</td>
-                <td>${signal.target.toFixed(4)}</td>
+            // Preenche o conteúdo do card com os dados do sinal
+            card.innerHTML = `
+                <h3>${signal.pair}</h3>
+                <p class="signal-text" style="color: ${signalColor}; font-weight: bold;">${signalText}</p>
+                <div class="details">
+                    <p><strong>Entrada:</strong> ${signal.entry.toFixed(4)}</p>
+                    <p><strong>Stop:</strong> ${signal.stop.toFixed(4)}</p>
+                    <p><strong>Target:</strong> ${signal.target.toFixed(4)}</p>
+                </div>
             `;
-            if (tableBody) tableBody.appendChild(row);
-        });
 
-        // Esconde "Carregando..." e mostra a tabela
-        if (loadingIndicator) loadingIndicator.style.display = 'none';
-        if (signalsTable) signalsTable.style.display = 'table';
+            // Adiciona o card criado ao container na página
+            container.appendChild(card);
+        });
 
     } catch (error) {
         console.error("Falha ao buscar sinais:", error);
-        if (loadingIndicator) {
-            loadingIndicator.textContent = "Erro ao carregar os sinais.";
-            loadingIndicator.style.color = "#dc3545";
-        }
+        // Mostra uma mensagem de erro amigável no container
+        container.innerHTML = '<p class="error-message">Ops! Não foi possível carregar os sinais. Tente novamente mais tarde.</p>';
     }
 }
-
