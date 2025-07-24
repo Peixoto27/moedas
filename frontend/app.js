@@ -1,1 +1,1 @@
-Conteúdo simulado de app.js
+fetch("https://moedas.up.railway.app/signals")
