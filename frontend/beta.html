@@ -4,50 +4,27 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>Crypton Signals (BETA)</title>
-    <!-- Reutilizando o mesmo CSS do site principal -->
     <link rel="stylesheet" href="style.css" />
     <style>
-        /* Estilos adicionais para a página beta */
-        .timeframe-selector {
-            text-align: center;
-            margin-bottom: 20px;
-        }
-        .timeframe-selector button {
-            padding: 10px 20px;
-            margin: 0 5px;
-            border: 1px solid #007bff;
-            background-color: transparent;
-            color: #007bff;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-        .timeframe-selector button.active {
-            background-color: #007bff;
-            color: #fff;
-        }
+        .timeframe-selector { text-align: center; margin-bottom: 20px; }
+        .timeframe-selector button { padding: 10px 20px; margin: 0 5px; border: 1px solid #007bff; background-color: transparent; color: #007bff; border-radius: 5px; cursor: pointer; transition: all 0.3s; }
+        .timeframe-selector button.active { background-color: #007bff; color: #fff; }
     </style>
 </head>
 <body>
-    <!-- A tela de login pode ser removida para testes ou mantida se preferir -->
     <div id="app">
       <header>
         <img src="logo.png" alt="Logo Crypton" height="40" />
         <h1>🔮 Crypton Signals <span style="color: #ffc107;">(BETA)</span></h1>
       </header>
-      
-      <!-- Seletor de Timeframes -->
       <div class="timeframe-selector">
-          <button onclick="changeTimeframe('1h', this)" id="btn-1h">1 Hora</button>
-          <button onclick="changeTimeframe('4h', this)" id="btn-4h">4 Horas</button>
-          <button onclick="changeTimeframe('1d', this)" id="btn-1d" class="active">Diário</button>
-          <button onclick="changeTimeframe('1w', this)" id="btn-1w">Semanal</button>
+          <button onclick="changeTimeframe('1h', this)">1 Hora</button>
+          <button onclick="changeTimeframe('4h', this)">4 Horas</button>
+          <button onclick="changeTimeframe('1d', this)" class="active">Diário</button>
+          <button onclick="changeTimeframe('1w', this)">Semanal</button>
       </div>
-
       <div id="signals-container" class="grid-container"></div>
     </div>
-
-    <!-- Usaremos um novo ficheiro JS para a página beta para manter a organização -->
     <script src="beta.js"></script>
 </body>
 </html>
