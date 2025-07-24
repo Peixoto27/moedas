@@ -1,78 +1,81 @@
-// Função principal que é chamada quando a página carrega
+// Espera o HTML da página carregar completamente antes de executar o script
 document.addEventListener('DOMContentLoaded', () => {
-    const loginButton = document.getElementById('login-button'); // Assumindo que o botão de login tem id="login-button"
-    const passwordInput = document.getElementById('password');   // Assumindo que o campo de senha tem id="password"
+    // Encontra os elementos na página
+    const loginButton = document.getElementById('login-button');
+    const passwordInput = document.getElementById('password');
 
-    // Adiciona o evento de clique ao botão de login
+    // Verifica se o botão de login existe antes de adicionar o evento
     if (loginButton) {
         loginButton.addEventListener('click', login);
+    } else {
+        console.error("Erro: Botão de login com id 'login-button' não foi encontrado.");
     }
 
-    // Adiciona o evento de "Enter" ao campo de senha
+    // Verifica se o campo de senha existe antes de adicionar o evento
     if (passwordInput) {
         passwordInput.addEventListener('keyup', function(event) {
+            // Se a tecla pressionada for "Enter", tenta fazer o login
             if (event.key === 'Enter') {
                 login();
             }
         });
+    } else {
+        console.error("Erro: Campo de senha com id 'password' não foi encontrado.");
     }
 });
 
-// --- LÓGICA DE LOGIN ---
+// Função que realiza o login
 function login() {
     const correctPassword = "Zoe1001";
-    const enteredPassword = document.getElementById('password').value;
-    const loginSection = document.getElementById('login-section'); // A div/seção de login
-    const signalsSection = document.getElementById('signals-section'); // A div/seção dos sinais
-    const errorMessage = document.getElementById('error-message'); // O elemento para mostrar erro de senha
+    const passwordInput = document.getElementById('password');
+    const enteredPassword = passwordInput ? passwordInput.value : '';
+
+    const loginSection = document.getElementById('login-section');
+    const signalsSection = document.getElementById('signals-section');
+    const errorMessage = document.getElementById('error-message');
 
     if (enteredPassword === correctPassword) {
-        // Esconde a seção de login e mostra a seção de sinais
+        // Esconde a seção de login e mostra a de sinais
         if (loginSection) loginSection.style.display = 'none';
         if (signalsSection) signalsSection.style.display = 'block';
         
-        fetchSignals(); // Chama a função para buscar os sinais
+        // Chama a função para buscar os sinais da API
+        fetchSignals();
     } else {
-        // Mostra a mensagem de erro
+        // Mostra a mensagem de erro de senha
         if (errorMessage) errorMessage.style.display = 'block';
     }
 }
 
-// --- LÓGICA PARA BUSCAR E EXIBIR OS SINAIS ---
+// Função que busca os dados da API e preenche a tabela
 async function fetchSignals() {
     const apiUrl = "https://moedas-production.up.railway.app/signals";
-    const tableBody = document.querySelector("#signals-table tbody" ); // O corpo da sua tabela de sinais
-    const loadingIndicator = document.getElementById('loading'); // Um elemento para mostrar "Carregando..."
-    const signalsTable = document.getElementById('signals-table'); // A tabela em si
+    const tableBody = document.querySelector("#signals-table tbody" );
+    const loadingIndicator = document.getElementById('loading');
+    const signalsTable = document.getElementById('signals-table');
 
-    // Mostra o indicador de "Carregando..." e esconde a tabela
+    // Mostra "Carregando..."
     if (loadingIndicator) loadingIndicator.style.display = 'block';
     if (signalsTable) signalsTable.style.display = 'none';
 
     try {
         const response = await fetch(apiUrl);
-        if (!response.ok) {
-            throw new Error(`Erro na rede: ${response.statusText}`);
-        }
+        if (!response.ok) throw new Error(`Erro na API: ${response.statusText}`);
+        
         const signals = await response.json();
 
-        // Limpa o corpo da tabela antes de adicionar novas linhas
-        if (tableBody) tableBody.innerHTML = ''; 
+        if (tableBody) tableBody.innerHTML = ''; // Limpa a tabela
 
         signals.forEach(signal => {
             const row = document.createElement('tr');
+            
+            // Lógica de cores
+            let signalColor = '#6c757d'; // Cinza padrão
+            const signalText = signal.signal;
+            if (signalText.includes('BUY') || signalText.includes('Alta')) signalColor = '#28a745'; // Verde
+            else if (signalText.includes('SELL') || signalText.includes('Baixa')) signalColor = '#dc3545'; // Vermelho
 
-            // --- LÓGICA DE CORES ---
-            let signalColor = '#6c757d'; // Cor padrão (cinza)
-            const signalText = signal.signal; // O texto do sinal, ex: "HOLD (Tendência de Alta)"
-
-            if (signalText.includes('BUY') || signalText.includes('Alta')) {
-                signalColor = '#28a745'; // Verde
-            } else if (signalText.includes('SELL') || signalText.includes('Baixa')) {
-                signalColor = '#dc3545'; // Vermelho
-            }
-
-            // Cria as células da tabela com os dados e a cor correta
+            // Preenche a linha da tabela
             row.innerHTML = `
                 <td>${signal.pair}</td>
                 <td>${signal.entry.toFixed(4)}</td>
@@ -83,15 +86,16 @@ async function fetchSignals() {
             if (tableBody) tableBody.appendChild(row);
         });
 
-        // Esconde o "loading" e mostra a tabela preenchida
+        // Esconde "Carregando..." e mostra a tabela
         if (loadingIndicator) loadingIndicator.style.display = 'none';
         if (signalsTable) signalsTable.style.display = 'table';
 
     } catch (error) {
         console.error("Falha ao buscar sinais:", error);
         if (loadingIndicator) {
-            loadingIndicator.textContent = "Erro ao carregar os sinais. Tente mais tarde.";
+            loadingIndicator.textContent = "Erro ao carregar os sinais.";
             loadingIndicator.style.color = "#dc3545";
         }
     }
 }
+
