@@ -1,21 +1,33 @@
+// Forçando um novo deploy para aplicar as configurações de diretório.
 let activeTimeframe = '1d';
 
+// Função chamada quando a página carrega
 document.addEventListener('DOMContentLoaded', () => {
+    // Busca os sinais do timeframe padrão ('1d') ao carregar a página
     fetchAndDisplaySignals(activeTimeframe);
 });
 
+// Função para mudar o timeframe e buscar novos dados
 function changeTimeframe(newTimeframe, clickedButton) {
+    // Atualiza o timeframe ativo
     activeTimeframe = newTimeframe;
+
+    // Atualiza o estilo dos botões para mostrar qual está ativo
     document.querySelectorAll('.timeframe-selector button').forEach(button => {
         button.classList.remove('active');
     });
     clickedButton.classList.add('active');
+
+    // Busca os sinais para o novo timeframe
     fetchAndDisplaySignals(activeTimeframe);
 }
 
+// Função principal para buscar e exibir os sinais
 async function fetchAndDisplaySignals(timeframe) {
+    // A URL agora aponta para a nova rota e inclui o parâmetro de timeframe
     const apiUrl = `https://moedas-production.up.railway.app/signals_v2?timeframe=${timeframe}`;
     const container = document.getElementById('signals-container' );
+
     container.innerHTML = `<p class="loading-message">Analisando o timeframe de ${timeframe}... ⏳</p>`;
 
     try {
@@ -57,10 +69,4 @@ async function fetchAndDisplaySignals(timeframe) {
         console.error("Falha ao buscar sinais:", error);
         container.innerHTML = `<p class="error-message">Ops! Falha ao carregar sinais. ${error.message}</p>`;
     }
-}```
-
----
-
-container.innerHTML = `<p class="error-message">Ops! Falha ao carregar sinais. ${error.message}</p>`;
-
-Estou aqui para ajudar nessa configuração assim que você terminar de organizar os ficheiros.
+}
